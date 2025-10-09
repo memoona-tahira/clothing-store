@@ -30,6 +30,7 @@ export const updateProduct = (req, res) => {
 // Delete a product
 export const deleteProduct = (req, res) => {
   res.json({
+    
     message: "delet products called",
   });
 };
