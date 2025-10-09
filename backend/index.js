@@ -1,8 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import productRoutes from './routes/productsRoutes.js';
-const app = express()
-const port = 3000
+import connectDB from './db/connection.js';
+const app = express();
+const port = process.env.PORT || 3000;
 
+connectDB();
 
 
 app.get('/', (req, res) => {
