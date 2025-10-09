@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:8.0.15-noble
+    container_name: clothing-store-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: clothing-store
+    volumes:
+      - mongodb_data:/data/db-cs
+
+volumes:
+  mongodb_data:
