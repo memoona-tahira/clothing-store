@@ -1,6 +1,6 @@
 
 
-import  mongoose  from ('mongoose');
+import  mongoose  from 'mongoose';
 
 const sizeSchema = new mongoose.Schema({
   value: {
