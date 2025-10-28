@@ -1,5 +1,6 @@
 import Product from "../models/productModel.js"
 import Category from "../models/categoryModel.js"
+import Stock from "../models/inventoryModel.js"
 // GET all products
 export const getProducts = async (req, res) => {
 
@@ -24,11 +25,18 @@ export const getProducts = async (req, res) => {
 let productsFromDB = [];
 
    productsFromDB = await Product.find({categoryId : categoryFromDB._id});
+
+
+const updatedProducts = productsFromDB.map((product) => ({
+      ...product.toObject(),
+      images: product.images.map((img) => `http://localhost:3000/images/${img}`),
+    }));
+
   res.json({
     message: "get all products called",
 
-    count: productsFromDB.length,
-    products: productsFromDB
+    count: updatedProducts.length,
+    products: updatedProducts
     
   });
 };
@@ -38,9 +46,20 @@ export const getProductById = async (req, res) => {
 
 
  const productFromDB = await Product.findById( req.params.id); 
+
+ const updatedProduct = {
+      ...productFromDB.toObject(),
+      images: productFromDB.images.map((img) => `http://localhost:3000/images/${img}`),
+    };
+
+const stocks=  await Stock.find({productId : productFromDB._id})
+
+
+
   res.json({
     message: "get all products",
-    product:productFromDB
+    product:updatedProduct,
+    stock: stocks
   });
 };
 

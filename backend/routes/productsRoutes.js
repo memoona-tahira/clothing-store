@@ -6,6 +6,7 @@ import { getProducts,
    deleteProduct
 
 } from "../controllers/productController.js";
+import getProductInventory from "../controllers/inventoryController.js"
 
 const router = express.Router();
 
@@ -19,5 +20,7 @@ router.route('/:id')
   .get(getProductById)
   .put(updateProduct)
   .delete(deleteProduct);
+
+router.route('/:id/stock').get(getProductInventory);
 
 export default router;

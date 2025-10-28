@@ -1,38 +1,162 @@
-.App {
-  text-align: center;
+nav {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: #333;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+nav a {
+  color: white;
+  text-decoration: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* responsive columns */
+  gap: 16px; /* space between cards */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.product-card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: 11px;
+ 
+}
+
+.product-image {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+
+
+
+.product-detail-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 30px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.product-images {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.product-detail-image {
+  width: 220px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: transform 0.2s;
+}
+
+.product-detail-image:hover {
+  transform: scale(1.05);
+}
+
+.product-info {
+  flex: 1;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+}
+
+.product-info h1 {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-size: 20px;
+  color: #333;
+  font-weight: bold;
+}
+
+.product-description {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.product-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-top: 15px;
+}
+
+.size-btn {
+  padding: 8px 16px;
+  border: 1px solid #aaa;
+  background-color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.size-btn.selected {
+  background-color: black;
   color: white;
+  border-color: black;
 }
 
-.App-link {
-  color: #61dafb;
+.product-stock {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #007b00;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.product-stock:has(+ .add-to-bag-btn[disabled]) {
+  color: red;
+}
+
+.add-to-bag-btn {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: none;
+  background-color: black;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.add-to-bag-btn:hover {
+  background-color: #333;
+}
+
+.add-to-bag-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.productOuterDiv{
+ display: flex;
+}
+
+.productInfo {
+  flex: 1; /* Takes remaining space (60%) */
+}
+
+.priceDetails {
+  flex: 0 0 40%; /* Takes exactly 40% */
 }
