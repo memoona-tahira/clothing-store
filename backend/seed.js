@@ -43,6 +43,8 @@ async function seedDB() {
       { value: "170", forKids: true },
     ]);
   }
+
+
   
   const productCount = await Product.countDocuments();
   if (productCount === 0) {

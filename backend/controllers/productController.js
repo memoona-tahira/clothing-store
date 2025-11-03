@@ -3,42 +3,41 @@ import Category from "../models/categoryModel.js"
 import Stock from "../models/inventoryModel.js"
 // GET all products
 export const getProducts = async (req, res) => {
+  try {
+    const categoryName = req.query.catagory;
 
-  // get category valuee from req e.g. ?category=Men
-  const categoryName = req.query.catagory;
+    let productsFromDB = [];
 
-  // use it  get catagory id
-   const categoryFromDB = await Category.findOne({name : categoryName});
-   console.log(categoryFromDB)
-    // If category is provided in query, add it to filter
+    if (categoryName) {
+      const categoryFromDB = await Category.findOne({ name: categoryName });
+      
+      if (!categoryFromDB) {
+        return res.status(400).json({
+          error: "Invalid category"
+        });
+      }
 
-
-    if (categoryFromDB == null) {
-     return res.status(400).json({
-        error : "wrong catagory"
-      });
+      productsFromDB = await Product.find({ categoryId: categoryFromDB._id })
+        .populate('categoryId', 'name'); // ADD THIS
+    } else {
+      productsFromDB = await Product.find()
+        .populate('categoryId', 'name'); // ADD THIS
     }
 
-      // is this if following find
-      
- 
-let productsFromDB = [];
-
-   productsFromDB = await Product.find({categoryId : categoryFromDB._id});
-
-
-const updatedProducts = productsFromDB.map((product) => ({
+    const updatedProducts = productsFromDB.map((product) => ({
       ...product.toObject(),
       images: product.images.map((img) => `http://localhost:3000/images/${img}`),
     }));
 
-  res.json({
-    message: "get all products called",
-
-    count: updatedProducts.length,
-    products: updatedProducts
-    
-  });
+    res.json({
+      message: "get all products called",
+      count: updatedProducts.length,
+      products: updatedProducts
+    });
+  } catch (error) {
+    console.error('Get products error:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
 };
 
 // Get one product by ID
