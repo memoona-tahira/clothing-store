@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ClothingStore",
+  "name": "Clothing Store - Fashion for Everyone",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#333333",
+  "background_color": "#ffffff",
+  "description": "Shop the latest fashion for Men, Women, and Kids"
 }

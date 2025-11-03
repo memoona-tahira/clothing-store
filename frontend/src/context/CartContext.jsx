@@ -1,38 +1,31 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-
+import { createContext, useState, useContext, useEffect } from "react";
 
 const CartContext = createContext();
 
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within CartProvider');
+    throw new Error("useCart must be used within CartProvider");
   }
   return context;
 };
 
-
 export const CartProvider = ({ children }) => {
-
-const [cartItems, setCartItems] = useState(()=>{
+  const [cartItems, setCartItems] = useState(() => {
     // get from localstorage
-            const savedCart = localStorage.getItem('cart');
-         return savedCart ? JSON.parse(savedCart) : [];
-});
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
-
-useEffect( ()=>{
-localStorage.setItem('cart', JSON.stringify(cartItems));
-
-},[cartItems]);
-
- const getCartCount = () => {
+  const getCartCount = () => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
   };
 
-
-const addToCart = (product, size, color, quantity = 1) => {
+  const addToCart = (product, size, color, quantity = 1) => {
     setCartItems((prevItems) => {
       // Check if item already exists in cart (same product, size, color)
       const existingItemIndex = prevItems.findIndex(
@@ -58,18 +51,22 @@ const addToCart = (product, size, color, quantity = 1) => {
             size: size,
             color: color,
             quantity: quantity,
-            image: product.images[0] || '/placeholder.png',
+            image: product.images[0] || "/placeholder.png",
           },
         ];
       }
     });
   };
 
-   const removeFromCart = (productId, size, color) => {
+  const removeFromCart = (productId, size, color) => {
     setCartItems((prevItems) =>
       prevItems.filter(
         (item) =>
-          !(item.productId === productId && item.size === size && item.color === color)
+          !(
+            item.productId === productId &&
+            item.size === size &&
+            item.color === color
+          )
       )
     );
   };
@@ -82,7 +79,9 @@ const addToCart = (product, size, color, quantity = 1) => {
 
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.productId === productId && item.size === size && item.color === color
+        item.productId === productId &&
+        item.size === size &&
+        item.color === color
           ? { ...item, quantity: newQuantity }
           : item
       )
@@ -94,29 +93,25 @@ const addToCart = (product, size, color, quantity = 1) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
   };
 
-
-
- return (
+  return (
     <CartContext.Provider
       value={{
-         cartItems,
+        cartItems,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         getCartTotal,
         getCartCount,
-        
       }}
     >
       {children}
     </CartContext.Provider>
   );
 };
-
-
-
-

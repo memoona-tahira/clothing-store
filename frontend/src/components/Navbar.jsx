@@ -1,58 +1,59 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { getCartCount } = useCart();
+  const { user, isAuthenticated, isAdmin, login, logout, loading } = useAuth();
   const cartCount = getCartCount();
 
   return (
-    <nav style={{ 
-      display: "flex", 
-      justifyContent: "space-between", 
-      alignItems: "center" 
-    }}>
-      <div style={{ display: "flex", gap: "1rem" }}>
+    <nav>
+      {/* Left side - Navigation links */}
+      <div className="nav-left">
         <Link to="/products?cat=Men">Men</Link>
         <Link to="/products?cat=Women">Women</Link>
         <Link to="/products?cat=Kids">Kids</Link>
-        <Link to="/admin">Admin</Link>
+        {isAdmin && <Link to="/admin">Admin</Link>}
       </div>
 
-      <Link
-        to="/cart"
-        style={{
-          position: "relative",
-          color: "white",
-          textDecoration: "none",
-          fontSize: "1.5rem",
-        }}
-      >
-        🛒
-        {cartCount > 0 && (
-          <span
-            style={{
-              position: "absolute",
-              top: "-4px",
-              right: "-4px",
-              backgroundColor: "red",
-              color: "white",
-              borderRadius: "50%",
-              padding: "1px 4px",
-              fontSize: "0.6rem",
-              fontWeight: "bold",
-              minWidth: "16px",
-              height: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              lineHeight: "1",
-            }}
-          >
-            {cartCount}
-          </span>
+      {/* Right side - User & Cart */}
+      <div className="nav-right">
+        {/* User section */}
+        {loading ? (
+          <span>Loading...</span>
+        ) : isAuthenticated ? (
+          <div className="user-info">
+            <Link to={isAdmin ? "/admin" : "/profile"} className="user-link">
+              {user.picture && (
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  className="user-avatar"
+                />
+              )}
+              <span>{user.name}</span>
+            </Link>
+            {isAdmin && <span className="admin-badge">ADMIN</span>}
+            <button onClick={logout} className="logout-btn">
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button onClick={login} className="login-btn">
+            <span>🔒</span>
+            Sign in with Google
+          </button>
         )}
-      </Link>
+
+        {/* Cart icon */}
+        <Link to="/cart" className="cart-link">
+          🛒
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+        </Link>
+      </div>
     </nav>
   );
 }
+
 export default Navbar;

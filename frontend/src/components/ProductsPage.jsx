@@ -25,7 +25,7 @@ const [searchParams] = useSearchParams();
 
     return(
         <div>
-        <h1>hello {catValue}</h1>
+        <h1>{catValue}</h1>
         <div className='products-grid'>
              {products.map(product => (
                <ProductsOverview key={product._id} product={product} />
