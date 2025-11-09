@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { User, IUser } from '../models/userModel.js';
+import { ClothingUser, IUser } from '../models/userModel.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,7 +17,7 @@ passport.use(
         console.log('🔍 Google Strategy - Profile ID:', profile.id);
         
         // Check if user already exists
-        let user = await User.findOne({ googleId: profile.id });
+        let user = await ClothingUser.findOne({ googleId: profile.id });
         
         if (user) {
           console.log('✅ Existing user found:', user._id);
@@ -25,7 +25,7 @@ passport.use(
         }
 
         // Create new user
-        user = await User.create({
+        user = await ClothingUser.create({
           googleId: profile.id,
           email: profile.emails?.[0]?.value || '',
           name: profile.displayName,
@@ -51,7 +51,7 @@ passport.serializeUser((user: any, done) => {
 passport.deserializeUser(async (id: string, done) => {
   console.log('🔍 DESERIALIZE USER ID:', id);
   try {
-    const user = await User.findById(id);
+    const user = await ClothingUser.findById(id);
     
     if (user) {
       console.log('User found during deserialize:', user.email);
