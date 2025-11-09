@@ -21,10 +21,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({
-  origin: process.env.FE_URL || 'http://localhost:5173',
-  credentials: true,
-}));
+app.use(cors({origin: '*'}));
 app.use(express.json());
 app.use('/images', express.static('images'));
 app.use((req, res, next) => {
