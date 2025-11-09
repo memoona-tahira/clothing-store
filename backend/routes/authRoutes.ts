@@ -22,22 +22,25 @@ router.get(
   }),
   (req: Request, res: Response) => {
     try {
-      if (req.user) {
+      // Type assertion for req.user
+      const user = req.user as any;
+      
+      if (user) {
         const frontendURL = process.env.FE_URL || 'http://localhost:5173';
-        console.log(`✅ Auth successful for user: ${req.user.email}`);
+        console.log(`✅ Auth successful for user: ${user.email}`);
         
         // Create JWT token
         const token = jwt.sign(
           { 
-            userId: req.user._id.toString(),
-            email: req.user.email,
-            isAdmin: req.user.isAdmin 
+            userId: user._id.toString(),
+            email: user.email,
+            isAdmin: user.isAdmin 
           }, 
           process.env.JWT_SECRET || 'fallback_jwt_secret', 
           { expiresIn: '7d' }
         );
         
-        console.log(`🔐 JWT Token created for user: ${req.user.email}`);
+        console.log(`🔐 JWT Token created for user: ${user.email}`);
         
         // Redirect with token
         res.redirect(`${frontendURL}/?auth_success=true&token=${token}`);
