@@ -18,10 +18,10 @@ export const getProducts = async (req, res) => {
       }
 
       productsFromDB = await Product.find({ categoryId: categoryFromDB._id })
-        .populate('categoryId', 'name'); // ADD THIS
+        .populate('categoryId', 'name'); 
     } else {
       productsFromDB = await Product.find()
-        .populate('categoryId', 'name'); // ADD THIS
+        .populate('categoryId', 'name'); 
     }
 
     const updatedProducts = productsFromDB.map((product) => ({

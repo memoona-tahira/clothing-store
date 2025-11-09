@@ -10,17 +10,22 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/products?cat=Men",
   "display": "standalone",
   "theme_color": "#333333",
   "background_color": "#ffffff",
-  "description": "Shop the latest fashion for Men, Women, and Kids"
+  "description": "Shop the latest fashion for Men, Women, and Kids",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle"],
+  "scope": "/"
 }

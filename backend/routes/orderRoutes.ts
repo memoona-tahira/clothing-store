@@ -63,6 +63,7 @@ router.get('/user/:userId', async (req, res) => {
     
     res.json({ orders });
   } catch (error) {
+     console.error('Fetch orders error:', error); 
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
@@ -78,6 +79,7 @@ router.get('/admin/all', async (req, res) => {
     
     res.json({ orders });
   } catch (error) {
+     console.error('Fetch orders error:', error); 
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
