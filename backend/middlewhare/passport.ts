@@ -55,6 +55,7 @@ passport.use(
   )
 );
 
+// Simplified serialization for JWT (still needed for passport)
 passport.serializeUser((user: any, done) => {
   console.log('📝 SERIALIZE USER ID:', user._id);
   done(null, user._id);

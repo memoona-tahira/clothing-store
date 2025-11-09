@@ -16,19 +16,46 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Configure axios to send cookies with requests - UPDATED
-  axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = API_BASE_URL;
+  // Create axios instance with JWT token
+  const authAxios = axios.create({
+    baseURL: API_BASE_URL,
+  });
+
+  // Add token to requests
+  authAxios.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   const checkAuth = async () => {
     try {
-      console.log('🔍 Checking auth status...');
-      const response = await axios.get('/auth/me');
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        console.log('🔍 No token found');
+        setUser(null);
+        return null;
+      }
+
+      console.log('🔍 Checking auth status with token...');
+      const response = await authAxios.get('/auth/me');
       console.log('✅ Auth check success:', response.data.user?.email);
       setUser(response.data.user);
       return response.data.user;
     } catch (error) {
       console.error("❌ Auth check failed:", error);
+      // If token is invalid, remove it
+      if (error.response?.status === 401) {
+        localStorage.removeItem('authToken');
+      }
       setUser(null);
       return null;
     }
@@ -40,7 +67,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = () => {
-    // Redirect to backend Google OAuth
     const toUrl = `${API_BASE_URL}/auth/google`;
     console.log("🔗 Redirecting to:", toUrl);
     window.location.href = toUrl;
@@ -48,10 +74,11 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/auth/logout');
+      await authAxios.post('/auth/logout');
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
+      localStorage.removeItem('authToken');
       setUser(null);
       window.location.href = "/";
     }
@@ -59,8 +86,6 @@ export const AuthProvider = ({ children }) => {
 
   const handleAuthCallback = async () => {
     console.log('🔄 Re-checking auth status after callback...');
-    // Wait a bit for session to be fully established
-    await new Promise(resolve => setTimeout(resolve, 1500));
     const user = await checkAuth();
     return user;
   };

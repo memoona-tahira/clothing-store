@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { IUser, ClothingUser } from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
 
 // Extend Express Request type to include user with IUser type
 declare global {
   namespace Express {
-    interface User extends IUser {} // Extend Passport's User type
+    interface User extends IUser {}
+    interface Request {
+      user?: IUser;
+    }
   }
 }
 
@@ -14,18 +18,37 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    console.log('🔍 Auth middleware - Session ID:', req.sessionID);
-    console.log('🔍 Auth middleware - User:', req.user ? req.user.email : 'none');
+    const authHeader = req.headers.authorization;
     
-    if (req.user) {
-      // User is authenticated via session
-      next();
-    } else {
-      console.log('❌ No user in session');
-      res.status(401).json({ error: 'Not authenticated' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
     }
+
+    const token = authHeader.substring(7);
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_jwt_secret') as any;
+    
+    // Find user by ID from token
+    const user = await ClothingUser.findById(decoded.userId);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    req.user = user;
+    next();
   } catch (error) {
     console.error('Auth middleware error:', error);
+    
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    
     res.status(500).json({ error: 'Authentication error' });
   }
 };
@@ -41,7 +64,7 @@ export const adminMiddleware = async (
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    if (!(req.user as IUser).isAdmin) {
+    if (!req.user.isAdmin) {
       return res.status(403).json({ error: 'Access denied. Admin only.' });
     }
 

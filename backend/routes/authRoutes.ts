@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import passport from '../middlewhare/passport.js';
+import jwt from 'jsonwebtoken';
+import { ClothingUser } from '../models/userModel.js';
 
 const router = express.Router();
 
@@ -10,12 +12,13 @@ router.get(
     scope: ['profile', 'email'],
   })
 );
-// Google OAuth callback - SIMPLIFIED
+
+// Google OAuth callback with JWT
 router.get(
   '/google/callback',
   passport.authenticate('google', { 
     failureRedirect: '/login',
-    session: true
+    session: false // Disable session for JWT
   }),
   (req: Request, res: Response) => {
     try {
@@ -23,9 +26,23 @@ router.get(
         const frontendURL = process.env.FE_URL || 'http://localhost:5173';
         console.log(`✅ Auth successful for user: ${req.user.email}`);
         
-        // ✅ SIMPLE FIX: Redirect directly to home page
-        res.redirect(`${frontendURL}/?auth_success=true`);
+        // Create JWT token
+        const token = jwt.sign(
+          { 
+            userId: req.user._id.toString(),
+            email: req.user.email,
+            isAdmin: req.user.isAdmin 
+          }, 
+          process.env.JWT_SECRET || 'fallback_jwt_secret', 
+          { expiresIn: '7d' }
+        );
+        
+        console.log(`🔐 JWT Token created for user: ${req.user.email}`);
+        
+        // Redirect with token
+        res.redirect(`${frontendURL}/?auth_success=true&token=${token}`);
       } else {
+        console.error('❌ No user in request after auth');
         res.redirect(`${process.env.FE_URL}/?error=no_user`);
       }
     } catch (error) {
@@ -35,38 +52,55 @@ router.get(
   }
 );
 
-// Logout
+// Logout (simple for JWT - just clear token on frontend)
 router.post('/logout', (req: Request, res: Response) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ error: 'Logout failed' });
-    }
-    req.session.destroy((error) => {
-      if (error) {
-        return res.status(500).json({ error: 'Session destruction failed' });
-      }
-      res.json({ message: 'Logged out successfully' });
-    });
-  });
+  res.json({ message: 'Logged out successfully' });
 });
 
-// Get current user
-router.get('/me', (req: Request, res: Response) => {
-  console.log('🔍 Checking auth status, user:', req.user ? req.user.email : 'none');
-  console.log('🔍 Session ID:', req.sessionID);
-  
-  if (req.user) {
+// Get current user using JWT
+router.get('/me', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.substring(7);
+    
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_jwt_secret') as any;
+    
+    // Find user by ID from token
+    const user = await ClothingUser.findById(decoded.userId);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    console.log('✅ JWT Auth successful for user:', user.email);
+    
     res.json({
       user: {
-        id: req.user._id,
-        email: req.user.email,
-        name: req.user.name,
-        picture: req.user.picture,
-        isAdmin: req.user.isAdmin,
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        isAdmin: user.isAdmin,
       },
     });
-  } else {
-    res.status(401).json({ error: 'Not authenticated' });
+  } catch (error) {
+    console.error('❌ JWT Auth error:', error);
+    
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    
+    res.status(500).json({ error: 'Authentication error' });
   }
 });
 

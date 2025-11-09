@@ -23,23 +23,10 @@ const PORT = process.env.PORT || 3000;
 // CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      console.log("call for", origin)
-      
-      const allowedOrigins = [
-        'https://clothing-store-c799.onrender.com',
-        'http://localhost:5173'
-      ];
-      
-      if (allowedOrigins.includes(origin)) {
-        console.log("OKOK")
-        return callback(null, true);
-      } else {
-        console.log('❌ Blocked by CORS:', origin);
-        return callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: [
+      'https://clothing-store-c799.onrender.com',
+      'http://localhost:5173'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -49,21 +36,31 @@ app.use(
 app.use(express.json());
 app.use('/images', express.static('images'));
 
-// ✅ FIXED: Only ONE session configuration
+
+app.use((req, res, next) => {
+  console.log('🔍 Session Debug:', {
+    sessionId: req.sessionID,
+    authenticated: req.isAuthenticated(),
+    user: req.user ? req.user.email : 'none',
+    cookies: req.headers.cookie
+  });
+  next();
+});
+
+// Session configuration (minimal for passport)
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
-    resave: true, // Changed to true
-    saveUninitialized: true, // Changed to true
+    resave: false,
+    saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI as string,
-      ttl: 14 * 24 * 60 * 60, // 14 days
     }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     },
   })
 );
