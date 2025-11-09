@@ -20,26 +20,27 @@ const AuthCallback = () => {
 
         if (error) {
           console.error('❌ Auth callback error:', error);
-          navigate(`/login?error=${error}`);
+          navigate('/?error=auth_failed');
           return;
         }
 
         if (success === 'true') {
           console.log('✅ Auth successful, checking user status...');
-          // Trigger auth check in context
-          handleAuthCallback();
+          // Wait a bit for session to be established
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
-          // Wait a moment for the auth check to complete
-          setTimeout(() => {
-            navigate('/'); // Redirect to home page
-          }, 1000);
+          // Trigger auth check in context
+          await handleAuthCallback();
+          
+          // Redirect to home page
+          navigate('/', { replace: true });
         } else {
           console.error('❌ Auth callback without success');
-          navigate('/login?error=auth_failed');
+          navigate('/?error=auth_failed');
         }
       } catch (error) {
         console.error('❌ Auth callback processing error:', error);
-        navigate('/login?error=server_error');
+        navigate('/?error=server_error');
       }
     };
 
@@ -56,6 +57,9 @@ const AuthCallback = () => {
       <div style={{ textAlign: 'center' }}>
         <h2>Completing login...</h2>
         <p>Please wait while we authenticate you.</p>
+        <div style={{ marginTop: '20px' }}>
+          <p>If you're not redirected automatically, <a href="/">click here</a></p>
+        </div>
       </div>
     </div>
   );

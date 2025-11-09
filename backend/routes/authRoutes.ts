@@ -25,16 +25,23 @@ router.get(
         const frontendURL = process.env.FE_URL || 'http://localhost:5173';
         console.log(`✅ Auth successful for user: ${req.user.email}`);
         console.log(`🔄 Redirecting to: ${frontendURL}/auth/google/callback`);
+        console.log(`🔍 Session ID: ${req.sessionID}`);
         
-        // Redirect to frontend with success
-        res.redirect(`${frontendURL}/auth/google/callback?success=true`);
+        // Save session before redirect
+        req.session.save((err) => {
+          if (err) {
+            console.error('❌ Session save error:', err);
+          }
+          // Redirect to frontend with success
+          res.redirect(`${frontendURL}/auth/google/callback?success=true`);
+        });
       } else {
         console.error('❌ No user in request after auth');
-        res.redirect(`${process.env.FE_URL}/login?error=no_user`);
+        res.redirect(`${process.env.FE_URL}/?error=no_user`);
       }
     } catch (error) {
       console.error('❌ Callback error:', error);
-      res.redirect(`${process.env.FE_URL}/login?error=server_error`);
+      res.redirect(`${process.env.FE_URL}/?error=server_error`);
     }
   }
 );
