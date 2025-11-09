@@ -40,7 +40,6 @@ app.use('/images', express.static('images'));
 app.use((req, res, next) => {
   console.log('🔍 Session Debug:', {
     sessionId: req.sessionID,
-    authenticated: req.isAuthenticated(),
     user: req.user ? req.user.email : 'none',
     cookies: req.headers.cookie
   });
