@@ -20,11 +20,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS configuration - UPDATE THIS
+// CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow REST tools
+      if (!origin) return callback(null, true);
       console.log("call for", origin)
       
       const allowedOrigins = [
@@ -46,7 +46,10 @@ app.use(
   })
 );
 
-// Session configuration - UPDATE THIS
+app.use(express.json());
+app.use('/images', express.static('images'));
+
+// ✅ FIXED: Only ONE session configuration
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
@@ -55,30 +58,6 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI as string,
       ttl: 14 * 24 * 60 * 60, // 14 days
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    },
-  })
-);
-app.use(express.json());
-app.use('/images', express.static('images'));
-app.use((req, res, next) => {
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  next();
-});
-
-// Session configuration
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET as string,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI as string,
     }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
@@ -111,7 +90,6 @@ app.use('/auth', authRoutes);
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/sizes', sizesRoutes);
 app.use('/api/v1/users', userRoutes);
-
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/cards', cardRoutes);
 app.use('/api/v1/stock', stockRoutes);

@@ -12,11 +12,33 @@ import AdminPage from './components/AdminPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Cart from './components/Cart';
+import { useEffect } from 'react';
+import { useAuth } from './context/AuthContext';
+
+// Inside your App component or create a wrapper
+function AuthHandler({ children }) {
+  const { handleAuthCallback } = useAuth();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authSuccess = urlParams.get('auth_success');
+    
+    if (authSuccess === 'true') {
+      console.log('🔄 Handling auth success...');
+      handleAuthCallback();
+      // Clean the URL
+      window.history.replaceState({}, '', '/');
+    }
+  }, [handleAuthCallback]);
+
+  return children;
+}
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
+          <AuthHandler>
         <div>
           <Navbar />
           <Routes>
@@ -35,6 +57,7 @@ function App() {
           <Footer />
           <InstallPrompt />
         </div>
+        </AuthHandler>
       </CartProvider>
     </AuthProvider>
   );

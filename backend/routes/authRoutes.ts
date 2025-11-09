@@ -10,7 +10,7 @@ router.get(
     scope: ['profile', 'email'],
   })
 );
-// Google OAuth callback - UPDATED
+// Google OAuth callback - SIMPLIFIED
 router.get(
   '/google/callback',
   passport.authenticate('google', { 
@@ -19,26 +19,13 @@ router.get(
   }),
   (req: Request, res: Response) => {
     try {
-      // Successful authentication
       if (req.user) {
         const frontendURL = process.env.FE_URL || 'http://localhost:5173';
         console.log(`✅ Auth successful for user: ${req.user.email}`);
-        console.log(`🔄 Redirecting to: ${frontendURL}/auth/google/callback`);
-        console.log(`🔍 Session ID: ${req.sessionID}`);
-        console.log(`🔍 User authenticated:`, req.isAuthenticated());
         
-        // Ensure session is saved before redirect
-        req.session.save((err) => {
-          if (err) {
-            console.error('❌ Session save error:', err);
-            return res.redirect(`${frontendURL}/?error=session_error`);
-          }
-          console.log('✅ Session saved successfully');
-          // Redirect to frontend with success
-          res.redirect(`${frontendURL}/auth/google/callback?success=true`);
-        });
+        // ✅ SIMPLE FIX: Redirect directly to home page
+        res.redirect(`${frontendURL}/?auth_success=true`);
       } else {
-        console.error('❌ No user in request after auth');
         res.redirect(`${process.env.FE_URL}/?error=no_user`);
       }
     } catch (error) {
