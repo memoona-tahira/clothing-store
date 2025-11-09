@@ -21,7 +21,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({origin: '*'}));
+
+console.log("cors enabled for : ",process.env.FE_URL )
+app.use(cors({
+  origin: process.env.FE_URL || 'https://clothing-store-c799.onrender.com',
+  credentials: true,
+}));
 app.use(express.json());
 app.use('/images', express.static('images'));
 app.use((req, res, next) => {
