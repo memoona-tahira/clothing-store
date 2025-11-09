@@ -20,7 +20,7 @@ function App() {
         <div>
           <Navbar />
           <Routes>
-            <Route path="/" element={<Navigate to="/products" replace />} />
+            <Route path="/" element={<ProductsPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/product-detail" element={<ProductDetail />} />
