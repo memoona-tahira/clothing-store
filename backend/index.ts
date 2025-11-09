@@ -20,16 +20,18 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-const allowedOrigins = [
-  'https://clothing-store-c799.onrender.com',
-];
-
+// CORS configuration - UPDATE THIS
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true); // allow REST tools
       console.log("call for", origin)
+      
+      const allowedOrigins = [
+        'https://clothing-store-c799.onrender.com',
+        'http://localhost:5173'
+      ];
+      
       if (allowedOrigins.includes(origin)) {
         console.log("OKOK")
         return callback(null, true);
@@ -39,9 +41,29 @@ app.use(
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
 
+// Session configuration - UPDATE THIS
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET as string,
+    resave: true, // Changed to true
+    saveUninitialized: true, // Changed to true
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI as string,
+      ttl: 14 * 24 * 60 * 60, // 14 days
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    },
+  })
+);
 app.use(express.json());
 app.use('/images', express.static('images'));
 app.use((req, res, next) => {

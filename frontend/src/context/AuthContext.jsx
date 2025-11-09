@@ -16,26 +16,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Configure axios to send cookies with requests
+  // Configure axios to send cookies with requests - UPDATED
   axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = API_BASE_URL;
+
+  const checkAuth = async () => {
+    try {
+      console.log('🔍 Checking auth status...');
+      const response = await axios.get('/auth/me');
+      console.log('✅ Auth check success:', response.data.user?.email);
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (error) {
+      console.error("❌ Auth check failed:", error);
+      setUser(null);
+      return null;
+    }
+  };
 
   // Check if user is logged in on mount
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        console.log('🔍 Checking initial auth status...');
-        const response = await axios.get(`${API_BASE_URL}/auth/me`);
-        console.log('✅ Initial auth check success:', response.data.user?.email);
-        setUser(response.data.user);
-      } catch (error) {
-        console.error("❌ Initial auth check failed:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
+    checkAuth().finally(() => setLoading(false));
   }, []);
 
   const login = () => {
@@ -47,26 +48,21 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/auth/logout`);
+      await axios.post('/auth/logout');
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
-      window.location.href = "/products?cat=Men";
+      window.location.href = "/";
     }
   };
 
   const handleAuthCallback = async () => {
-    // Re-check auth status after callback
     console.log('🔄 Re-checking auth status after callback...');
-    try {
-      const response = await axios.get(`${API_BASE_URL}/auth/me`);
-      console.log('✅ Post-callback auth success:', response.data.user?.email);
-      setUser(response.data.user);
-    } catch (error) {
-      console.error("❌ Post-callback auth check failed:", error);
-      setUser(null);
-    }
+    // Wait a bit for session to be fully established
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const user = await checkAuth();
+    return user;
   };
 
   return (

@@ -26,14 +26,20 @@ const AuthCallback = () => {
 
         if (success === 'true') {
           console.log('✅ Auth successful, checking user status...');
-          // Wait a bit for session to be established
+          
+          // Wait for session to be established
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          // Trigger auth check in context
-          await handleAuthCallback();
+          // Trigger auth check
+          const user = await handleAuthCallback();
           
-          // Redirect to home page
-          navigate('/', { replace: true });
+          if (user) {
+            console.log('✅ User authenticated successfully:', user.email);
+            navigate('/', { replace: true });
+          } else {
+            console.error('❌ User not found after auth');
+            navigate('/?error=user_not_found');
+          }
         } else {
           console.error('❌ Auth callback without success');
           navigate('/?error=auth_failed');
