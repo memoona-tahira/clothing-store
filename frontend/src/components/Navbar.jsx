@@ -11,7 +11,7 @@ function Navbar() {
     <nav>
       {/* Left side - Navigation links */}
       <div className="nav-left">
-        <Link to="/products">Home</Link>
+        <Link to="/">Home</Link>
         <Link to="/products?cat=Men">Men</Link>
         <Link to="/products?cat=Women">Women</Link>
         <Link to="/products?cat=Kids">Kids</Link>
@@ -21,7 +21,7 @@ function Navbar() {
       {/* Center - Logo/Brand */}
       <div className="nav-center">
         <Link
-          to="/products?cat=Men"
+          to="/"
           style={{ textDecoration: "none", color: "white" }}
         >
           FASHION

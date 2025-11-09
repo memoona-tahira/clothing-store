@@ -37,7 +37,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     // Redirect to backend Google OAuth
-    window.location.href = `${API_BASE_URL}/auth/google`;
+    var toUrl=`${API_BASE_URL}/auth/google`;
+    console.log("will call :",toUrl)
+    window.location.href = toUrl;
   };
 
   const logout = async () => {
