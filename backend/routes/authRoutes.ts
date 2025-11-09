@@ -20,6 +20,7 @@ router.get(
     if (req.session && req.sessionID) {
       // Send session ID as token to frontend
       const frontendURL = process.env.FE_URL || 'http://localhost:5173';
+      console.log(`redirecting to ${frontendURL}`)
       res.redirect(`${frontendURL}/auth/callback?token=${req.sessionID}`);
     } else {
       res.redirect('/login?error=session');

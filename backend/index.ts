@@ -29,7 +29,9 @@ app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true); // allow REST tools
+      console.log("call for", origin)
       if (allowedOrigins.includes(origin)) {
+        console.log("OKOK")
         return callback(null, true);
       } else {
         console.log('❌ Blocked by CORS:', origin);
