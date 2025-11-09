@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../../config/api';  
 
 function ProductsList() {
   const [products, setProducts] = useState([]);
@@ -9,7 +10,7 @@ function ProductsList() {
   }, []);
 
   const fetchProducts = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/products');
+    const response = await axios.get(`${API_BASE_URL}/api/v1/products`);
     setProducts(response.data.products);
   };
 

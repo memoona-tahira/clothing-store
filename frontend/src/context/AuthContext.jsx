@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
-
+import API_BASE_URL from '../config/api'; 
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/auth/me");
+        const response = await axios.get(`${API_BASE_URL}/auth/me`);
         setUser(response.data.user);
       } catch (error) {
         console.error("Auth check failed:", error);
@@ -37,12 +37,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     // Redirect to backend Google OAuth
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
   const logout = async () => {
     try {
-      await axios.post("http://localhost:3000/auth/logout");
+      await axios.post(`${API_BASE_URL}/auth/logout`);
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     // Just trigger a re-check of auth status
     const checkAuth = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/auth/me");
+        const response = await axios.get(`${API_BASE_URL}/auth/me`);
         setUser(response.data.user);
       } catch (error) {
         console.error("Auth check failed after callback:", error);

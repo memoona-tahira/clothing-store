@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../../config/api';  
 
 function StockManagement() {
   const [stocks, setStocks] = useState([]);
@@ -20,24 +21,24 @@ function StockManagement() {
   }, []);
 
   const fetchStocks = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/stock/admin/all');
+    const response = await axios.get(`${API_BASE_URL}/api/v1/stock/admin/all`);
     setStocks(response.data.stocks);
   };
 
   const fetchProducts = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/products');
+    const response = await axios.get(`${API_BASE_URL}/api/v1/products`);
     setProducts(response.data.products);
   };
 
   const fetchSizes = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/sizes');
+    const response = await axios.get(`${API_BASE_URL}/api/v1/sizes`);
     setSizes(response.data.sizes);
   };
 
   const handleAddStock = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/v1/stock', formData);
+      await axios.post(`${API_BASE_URL}/api/v1/stock`, formData);
       setShowAddForm(false);
       fetchStocks();
       setFormData({ productId: '', sizeId: '', color: '', quantity: 0 });

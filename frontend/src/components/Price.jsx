@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCart } from '../context/CartContext';
+import API_BASE_URL from '../config/api';
 
 function Price({ product }) {
   const { addToCart } = useCart();
@@ -11,13 +12,13 @@ function Price({ product }) {
 
   useEffect(() => {
     const getAllSizes = async () => {
-      const response = await axios.get(`http://localhost:3000/api/v1/sizes`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/sizes`);
       setSizes(response.data.sizes);
     };
 
     const getStock = async () => {
       const response = await axios.get(
-        `http://localhost:3000/api/v1/products/${product._id}/stock`
+        `${API_BASE_URL}/api/v1/products/${product._id}/stock`
       );
       setStock(response.data.stock);
     };

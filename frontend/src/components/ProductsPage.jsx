@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ProductsOverview from './ProductsOverview';
 import axios from 'axios'; 
+import API_BASE_URL from '../config/api';
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -11,11 +12,11 @@ function ProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       if (catValue !== null) {
-        const response = await axios.get(`http://localhost:3000/api/v1/products?catagory=${catValue}`);
+        const response = await axios.get(`${API_BASE_URL}/api/v1/products?catagory=${catValue}`);
         setProducts(response.data.products);
       } else {
         console.log("all products?");
-        const response = await axios.get(`http://localhost:3000/api/v1/products`);
+        const response = await axios.get(`${API_BASE_URL}/api/v1/products`);
         setProducts(response.data.products);
       }
     };

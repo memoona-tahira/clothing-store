@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 function Checkout() {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -38,7 +39,7 @@ function Checkout() {
   const fetchCards = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/cards/user/${user.id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/cards/user/${user.id}`);
       setCards(response.data.cards);
       if (response.data.cards.length > 0) {
         setSelectedCard(response.data.cards.find(c => c.isDefault) || response.data.cards[0]);
@@ -51,7 +52,7 @@ function Checkout() {
   const handleAddCard = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/v1/cards', {
+      await axios.post(`${API_BASE_URL}/api/v1/cards`, {
         ...newCard,
         userId: user.id,
         isDefault: cards.length === 0
@@ -84,13 +85,13 @@ function Checkout() {
 
     try {
       // Fetch all sizes to convert size values to IDs
-      const sizesResponse = await axios.get('http://localhost:3000/api/v1/sizes');
+      const sizesResponse = await axios.get(`${API_BASE_URL}/api/v1/sizes`);
       const sizes = sizesResponse.data.sizes;
 
       // If using new card and saveCard is checked, save it first
       let paymentMethod = selectedCard;
       if (!selectedCard && newCard.saveCard) {
-        const cardResponse = await axios.post('http://localhost:3000/api/v1/cards', {
+        const cardResponse = await axios.post(`${API_BASE_URL}/api/v1/cards`, {
           ...newCard,
           userId: user.id,
           isDefault: cards.length === 0
@@ -135,7 +136,7 @@ function Checkout() {
         }
       };
 
-      await axios.post('http://localhost:3000/api/v1/orders', orderData);
+      await axios.post(`${API_BASE_URL}/api/v1/orders`, orderData);
       
       clearCart();
       alert('Order placed successfully!');

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../../config/api';
 
 function OrdersManagement() {
   const [orders, setOrders] = useState([]);
@@ -9,13 +10,13 @@ function OrdersManagement() {
   }, []);
 
   const fetchOrders = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/orders/admin/all');
+    const response = await axios.get(`${API_BASE_URL}/api/v1/orders/admin/all`);
     setOrders(response.data.orders);
   };
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:3000/api/v1/orders/${orderId}/status`, {
+      await axios.patch(`${API_BASE_URL}/api/v1/orders/${orderId}/status`, {
         status: newStatus
       });
       fetchOrders();

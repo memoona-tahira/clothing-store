@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Price from "./Price";
+import API_BASE_URL from '../config/api';
 
 function ProductDetail() {
   //get id from url
@@ -16,9 +17,7 @@ function ProductDetail() {
   // Fetch product details from backend
   useEffect(() => {
     const fetchProduct = async () => {
-      const response = await axios.get(
-        `http://localhost:3000/api/v1/products/${productId}`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/v1/products/${productId}`);
       setProduct(response.data.product);
     };
     fetchProduct();

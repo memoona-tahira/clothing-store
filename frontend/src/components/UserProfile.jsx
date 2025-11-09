@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 function UserProfile() {
   const { user, isAuthenticated } = useAuth();
@@ -23,7 +24,7 @@ function UserProfile() {
   const fetchOrders = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/orders/user/${user.id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/orders/user/${user.id}`);
       setOrders(response.data.orders);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
@@ -33,7 +34,7 @@ function UserProfile() {
   const fetchCards = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/cards/user/${user.id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/cards/user/${user.id}`);
       setCards(response.data.cards);
     } catch (error) {
       console.error('Failed to fetch cards:', error);
@@ -53,7 +54,7 @@ function UserProfile() {
 
   const setDefaultCard = async (cardId) => {
     try {
-      await axios.patch(`http://localhost:3000/api/v1/cards/${cardId}/default`);
+      await axios.patch(`${API_BASE_URL}/api/v1/cards/${cardId}/default`);
       fetchCards();
     } catch (error) {
       alert('Failed to set default card');
