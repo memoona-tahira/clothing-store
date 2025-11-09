@@ -20,7 +20,7 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/products?cat=Men",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#333333",
   "background_color": "#ffffff",
