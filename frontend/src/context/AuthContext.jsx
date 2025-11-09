@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from '../config/api'; 
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -22,10 +23,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('🔍 Checking initial auth status...');
         const response = await axios.get(`${API_BASE_URL}/auth/me`);
+        console.log('✅ Initial auth check success:', response.data.user?.email);
         setUser(response.data.user);
       } catch (error) {
-        console.error("Auth check failed:", error);
+        console.error("❌ Initial auth check failed:", error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -37,8 +40,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     // Redirect to backend Google OAuth
-    var toUrl=`${API_BASE_URL}/auth/google`;
-    console.log("will call :",toUrl)
+    const toUrl = `${API_BASE_URL}/auth/google`;
+    console.log("🔗 Redirecting to:", toUrl);
     window.location.href = toUrl;
   };
 
@@ -53,17 +56,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleAuthCallback = () => {
-    // Just trigger a re-check of auth status
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/auth/me`);
-        setUser(response.data.user);
-      } catch (error) {
-        console.error("Auth check failed after callback:", error);
-      }
-    };
-    checkAuth();
+  const handleAuthCallback = async () => {
+    // Re-check auth status after callback
+    console.log('🔄 Re-checking auth status after callback...');
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/me`);
+      console.log('✅ Post-callback auth success:', response.data.user?.email);
+      setUser(response.data.user);
+    } catch (error) {
+      console.error("❌ Post-callback auth check failed:", error);
+      setUser(null);
+    }
   };
 
   return (

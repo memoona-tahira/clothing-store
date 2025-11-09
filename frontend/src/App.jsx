@@ -25,9 +25,12 @@ function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/product-detail" element={<ProductDetail />} />
             <Route path='/cart' element={<Cart />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
+            {/* Updated to match backend redirect */}
+            <Route path="/auth/google/callback" element={<AuthCallback />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<UserProfile />} />
+            {/* Redirect for old URL */}
+            <Route path="/auth/callback" element={<Navigate to="/auth/google/callback" replace />} />
           </Routes>
           <Footer />
           <InstallPrompt />

@@ -14,37 +14,16 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    console.log('🔍 Auth middleware - Session ID:', req.sessionID);
+    console.log('🔍 Auth middleware - User:', req.user ? req.user.email : 'none');
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
+    if (req.user) {
+      // User is authenticated via session
+      next();
+    } else {
+      console.log('❌ No user in session');
+      res.status(401).json({ error: 'Not authenticated' });
     }
-
-    const token = authHeader.substring(7);
-
-    req.sessionStore.get(token, async (err: any, session: any) => {
-      if (err || !session) {
-        return res.status(401).json({ error: 'Invalid token' });
-      }
-
-      if (session && session.passport && session.passport.user) {
-        try {
-          const user = await ClothingUser.findById(session.passport.user);
-          
-          if (user) {
-            req.user = user as any; // Type assertion
-            next();
-          } else {
-            res.status(401).json({ error: 'User not found' });
-          }
-        } catch (dbError) {
-          console.error('Database error:', dbError);
-          res.status(500).json({ error: 'Database error' });
-        }
-      } else {
-        res.status(401).json({ error: 'Invalid session' });
-      }
-    });
   } catch (error) {
     console.error('Auth middleware error:', error);
     res.status(500).json({ error: 'Authentication error' });

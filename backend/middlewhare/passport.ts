@@ -15,12 +15,24 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         console.log('🔍 Google Strategy - Profile ID:', profile.id);
+        console.log('🔍 Google Strategy - Email:', profile.emails?.[0]?.value);
         
-        // Check if user already exists
+        // Check if user already exists by googleId
         let user = await ClothingUser.findOne({ googleId: profile.id });
         
         if (user) {
-          console.log('✅ Existing user found:', user._id);
+          console.log('✅ Existing user found:', user.email);
+          return done(null, user);
+        }
+
+        // Also check if user exists by email (in case they signed up differently)
+        user = await ClothingUser.findOne({ email: profile.emails?.[0]?.value });
+        
+        if (user) {
+          // Update existing user with googleId
+          user.googleId = profile.id;
+          await user.save();
+          console.log('✅ Updated existing user with Google ID:', user.email);
           return done(null, user);
         }
 
@@ -30,10 +42,10 @@ passport.use(
           email: profile.emails?.[0]?.value || '',
           name: profile.displayName,
           picture: profile.photos?.[0]?.value || '',
-          isAdmin: false, // Default to non-admin
+          isAdmin: false,
         });
         
-        console.log('✅ New user created:', user._id);
+        console.log('✅ New user created:', user.email);
         return done(null, user);
       } catch (error) {
         console.error('❌ Google Strategy error:', error);
@@ -54,14 +66,14 @@ passport.deserializeUser(async (id: string, done) => {
     const user = await ClothingUser.findById(id);
     
     if (user) {
-      console.log('User found during deserialize:', user.email);
+      console.log('✅ User found during deserialize:', user.email);
       done(null, user);
     } else {
-      console.log('No user found with ID:', id);
+      console.log('❌ No user found with ID:', id);
       done(null, false);
     }
   } catch (error) {
-    console.error('DESERIALIZE ERROR:', error);
+    console.error('❌ DESERIALIZE ERROR:', error);
     done(error as Error, false);
   }
 });

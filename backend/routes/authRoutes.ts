@@ -11,19 +11,30 @@ router.get(
   })
 );
 
-// Google OAuth callback
+// Google OAuth callback - FIXED REDIRECT URL
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { 
+    failureRedirect: '/login',
+    session: true
+  }),
   (req: Request, res: Response) => {
-    // Successful authentication
-    if (req.session && req.sessionID) {
-      // Send session ID as token to frontend
-      const frontendURL = process.env.FE_URL || 'http://localhost:5173';
-      console.log(`redirecting to ${frontendURL}`)
-      res.redirect(`${frontendURL}/auth/callback?token=${req.sessionID}`);
-    } else {
-      res.redirect('/login?error=session');
+    try {
+      // Successful authentication
+      if (req.user) {
+        const frontendURL = process.env.FE_URL || 'http://localhost:5173';
+        console.log(`✅ Auth successful for user: ${req.user.email}`);
+        console.log(`🔄 Redirecting to: ${frontendURL}/auth/google/callback`);
+        
+        // Redirect to frontend with success
+        res.redirect(`${frontendURL}/auth/google/callback?success=true`);
+      } else {
+        console.error('❌ No user in request after auth');
+        res.redirect(`${process.env.FE_URL}/login?error=no_user`);
+      }
+    } catch (error) {
+      console.error('❌ Callback error:', error);
+      res.redirect(`${process.env.FE_URL}/login?error=server_error`);
     }
   }
 );
@@ -45,6 +56,9 @@ router.post('/logout', (req: Request, res: Response) => {
 
 // Get current user
 router.get('/me', (req: Request, res: Response) => {
+  console.log('🔍 Checking auth status, user:', req.user ? req.user.email : 'none');
+  console.log('🔍 Session ID:', req.sessionID);
+  
   if (req.user) {
     res.json({
       user: {
