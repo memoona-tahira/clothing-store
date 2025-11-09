@@ -37,15 +37,6 @@ app.use(express.json());
 app.use('/images', express.static('images'));
 
 
-app.use((req, res, next) => {
-  console.log('🔍 Session Debug:', {
-    sessionId: req.sessionID,
-    user: req.user ? req.user.email : 'none',
-    cookies: req.headers.cookie
-  });
-  next();
-});
-
 // Session configuration (minimal for passport)
 app.use(
   session({

@@ -72,17 +72,19 @@ export const AuthProvider = ({ children }) => {
     window.location.href = toUrl;
   };
 
-  const logout = async () => {
-    try {
-      await authAxios.post('/auth/logout');
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.removeItem('authToken');
-      setUser(null);
-      window.location.href = "/";
-    }
-  };
+
+const logout = async () => {
+  try {
+    await authAxios.post('/auth/logout');
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    localStorage.removeItem('authToken');
+    setUser(null);
+    // FIX: Redirect to root instead of /products?cat=Men
+    window.location.href = "/";
+  }
+};
 
   const handleAuthCallback = async () => {
     console.log('🔄 Re-checking auth status after callback...');
