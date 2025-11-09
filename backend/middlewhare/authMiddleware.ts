@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { IUser } from '../models/userModel.js';
+import { IUser, ClothingUser } from '../models/userModel.js';
 
-// Extend Express Request type to include user
+// Extend Express Request type to include user with IUser type
 declare global {
   namespace Express {
-    interface Request {
-      user?: IUser;
-    }
+    interface User extends IUser {} // Extend Passport's User type
   }
 }
 
@@ -22,7 +20,7 @@ export const authMiddleware = async (
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
 
     req.sessionStore.get(token, async (err: any, session: any) => {
       if (err || !session) {
@@ -31,11 +29,10 @@ export const authMiddleware = async (
 
       if (session && session.passport && session.passport.user) {
         try {
-          const { User } = await import('../models/userModel.js');
-          const user = await User.findById(session.passport.user);
+          const user = await ClothingUser.findById(session.passport.user);
           
           if (user) {
-            req.user = user; // Set user for route handlers
+            req.user = user as any; // Type assertion
             next();
           } else {
             res.status(401).json({ error: 'User not found' });
@@ -65,7 +62,7 @@ export const adminMiddleware = async (
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    if (!req.user.isAdmin) {
+    if (!(req.user as IUser).isAdmin) {
       return res.status(403).json({ error: 'Access denied. Admin only.' });
     }
 
