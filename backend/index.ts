@@ -25,6 +25,7 @@ app.use(
   cors({
     origin: [
       'https://clothing-store-c799.onrender.com',
+      'https://clothing-store-moona.netlify.app',
       'http://localhost:5173'
     ],
     credentials: true,
