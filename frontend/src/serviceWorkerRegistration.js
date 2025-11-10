@@ -8,6 +8,11 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
+  // TEMPORARILY DISABLE SERVICE WORKER TO FIX ROUTING ISSUES
+  console.log('🔄 Service Worker disabled temporarily to fix routing issues');
+  return;
+
+  /*
   if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
@@ -36,6 +41,7 @@ export function register(config) {
       }
     });
   }
+  */
 }
 
 function registerValidSW(swUrl, config) {
@@ -110,9 +116,10 @@ export function unregister() {
     navigator.serviceWorker.ready
       .then((registration) => {
         registration.unregister();
+        console.log('✅ Service Worker unregistered successfully');
       })
       .catch((error) => {
-        console.error(error.message);
+        console.error('Error unregistering service worker:', error.message);
       });
   }
 }
