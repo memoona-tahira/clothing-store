@@ -11,15 +11,21 @@ function ProductsPage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (catValue !== null) {
-        const response = await axios.get(`${API_BASE_URL}/api/v1/products?catagory=${catValue}`);
+      try {
+        let url = `${API_BASE_URL}/api/v1/products`;
+        
+        if (catValue) {
+          url += `?category=${catValue}`;
+        }
+        
+        console.log("Fetching products from:", url);
+        const response = await axios.get(url);
         setProducts(response.data.products);
-      } else {
-        console.log("all products?");
-        const response = await axios.get(`${API_BASE_URL}/api/v1/products`);
-        setProducts(response.data.products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
       }
     };
+    
     fetchProducts();
   }, [catValue]);
 
