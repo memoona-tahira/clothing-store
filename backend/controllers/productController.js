@@ -24,10 +24,11 @@ export const getProducts = async (req, res) => {
         .populate('categoryId', 'name'); 
     }
 
-    const updatedProducts = productsFromDB.map((product) => ({
-      ...product.toObject(),
-      images: product.images.map((img) => `http://localhost:3000/images/${img}`),
-    }));
+const updatedProducts = productsFromDB.map((product) => ({
+  ...product.toObject(),
+  images: product.images.map((img) => `${process.env.BE_URL}/images/${img}`),
+}));
+
 
     res.json({
       message: "get all products called",
